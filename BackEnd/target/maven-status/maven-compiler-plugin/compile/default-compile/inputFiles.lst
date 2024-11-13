@@ -33,12 +33,11 @@ D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\repositories\LocalUserRepo
 D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\repositories\RoleRepository.java
 D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\repositories\TextMessageRepository.java
 D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\security\AuthFilter.java
-D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\security\LocaUserDetails.java
+D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\security\LocalUserDetails.java
 D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\security\OpenApiConfig.java
 D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\security\SecurityConfig.java
 D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\security\TokenUtil.java
 D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\services\ChatService.java
-D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\services\CloudinaryController.java
 D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\services\CloudinaryService.java
 D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\services\EmailService.java
 D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\services\ImageService.java
@@ -48,5 +47,4 @@ D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\services\RoleService.java
 D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\services\SignUpService.java
 D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\services\TextMessageService.java
 D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\shared\Response.java
-D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\shared\TokenHolder.java
 D:\GitHub\chat\BackEnd\src\main\java\com\example\chat\shared\Validator.java

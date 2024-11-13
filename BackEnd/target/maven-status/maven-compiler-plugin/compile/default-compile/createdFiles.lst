@@ -1,9 +1,7 @@
 com\example\chat\config\WebSocketHandler.class
 com\example\chat\dtos\UpdateTextMessageStatusRequest.class
-com\example\chat\security\LocaUserDetails.class
 com\example\chat\models\Role.class
 com\example\chat\shared\Validator.class
-com\example\chat\services\CloudinaryController.class
 com\example\chat\controllers\ChatController.class
 com\example\chat\controllers\SignUpController.class
 com\example\chat\security\SecurityConfig$1.class
@@ -22,7 +20,6 @@ com\example\chat\services\LocalUserService.class
 com\example\chat\services\LoginService.class
 com\example\chat\controllers\LocalUserController.class
 com\example\chat\config\JacksonConfig.class
-com\example\chat\shared\TokenHolder.class
 com\example\chat\security\OpenApiConfig.class
 com\example\chat\models\LocalUser.class
 com\example\chat\repositories\ChatRepository.class
