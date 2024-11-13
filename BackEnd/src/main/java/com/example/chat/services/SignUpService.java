@@ -55,11 +55,8 @@ public class SignUpService {
 
             request.setPassword(passwordEncoder.encode(request.getPassword()));
             LocalUser user = localUserMapper.toEntity(request);
-            user.setActive(false);
-            user.setOnline(false);
 
             Role role = roleService.getByRole("ROLE_USER");
-            localUserRepository.save(user);
             if (role == null) {
                 role = new Role();
                 role.setRole("ROLE_USER");
@@ -68,15 +65,19 @@ public class SignUpService {
             }
             user.setRoles(List.of(role));
             if (request.getImage() != null)
-                imageService.uploadImage(request.getImage(), user);
+                user = imageService.uploadImage(request.getImage(), user);
 
             localUserRepository.save(user);
 
             return user;
 
-        } catch (Exception e) {
+        } catch (CustomException e) {
 
             throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
         }
 
     }

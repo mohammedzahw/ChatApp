@@ -13,37 +13,25 @@ import com.example.chat.models.LocalUser;
 
 public class LocalUserMapper {
 
-    public LocalUser toEntity(LocalUserDto userDto) {
-        if (userDto == null) {
+
+
+    public LocalUser toEntity(SignUpRequest signUpRequest) {
+        if (signUpRequest == null) {
             return null;
         }
 
-        LocalUser.LocalUserBuilder localUser = LocalUser.builder();
+        LocalUser localUser = new LocalUser();
+        localUser.setAbout(signUpRequest.getAbout());
+        localUser.setEmail(signUpRequest.getEmail());
+        localUser.setName(signUpRequest.getName());
+        localUser.setPassword(signUpRequest.getPassword());
 
-        localUser.about(userDto.getAbout());
+        localUser.setActive(false);
+        localUser.setOnline(false);
 
-        localUser.id(userDto.getId());
 
-        localUser.name(userDto.getName());
 
-        return localUser.build();
-    }
-
-    /********************************************************************************************* */
-
-    public LocalUser toEntity(SignUpRequest signUpRequestDto) {
-        if (signUpRequestDto == null) {
-            return null;
-        }
-
-        LocalUser.LocalUserBuilder localUser = LocalUser.builder();
-
-        localUser.about(signUpRequestDto.getAbout());
-        localUser.email(signUpRequestDto.getEmail());
-        localUser.name(signUpRequestDto.getName());
-        localUser.password(signUpRequestDto.getPassword());
-
-        return localUser.build();
+        return localUser;
     }
 
     /********************************************************************************************* */

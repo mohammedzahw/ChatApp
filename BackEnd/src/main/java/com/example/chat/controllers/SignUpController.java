@@ -55,16 +55,16 @@ public class SignUpController {
             if (result.hasErrors()) {
                 return Validator.validate(result);
             }
-            LocalUser LocalUser = localUserRepository.findByEmail(signUpRequest.getEmail()).orElse(null);
-            if (LocalUser != null) {
+            LocalUser localUser = localUserRepository.findByEmail(signUpRequest.getEmail()).orElse(null);
+            if (localUser != null) {
                 return new Response(HttpStatus.BAD_REQUEST, null, "Email already exists ,Please login");
             }
 
-            LocalUser = signUpService.saveUser(signUpRequest);
+            localUser = signUpService.saveUser(signUpRequest);
 
             // send email
             String token = tokenUtil.generateToken(signUpRequest.getEmail(),
-                    LocalUser.getId(), 1000);
+                    localUser.getId(), 1000);
             signUpService.sendRegistrationVerificationCode(signUpRequest.getEmail(),
                     request,
                     token);

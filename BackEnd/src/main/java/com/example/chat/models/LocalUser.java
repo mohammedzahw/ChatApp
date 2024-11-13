@@ -12,16 +12,19 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "local_user", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email")
+})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class LocalUser {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,12 +32,10 @@ public class LocalUser {
     private String name;
     private String email;
     private String password;
-    private String phone;
     private String about;
     private Boolean online;
     private Boolean active;
     private String imageId;
-
     private String imageUrl;
 
     @ManyToMany(fetch = FetchType.EAGER)

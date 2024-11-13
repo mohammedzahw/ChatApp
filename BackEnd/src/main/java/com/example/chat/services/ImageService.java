@@ -12,27 +12,23 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.chat.exception.CustomException;
 import com.example.chat.models.LocalUser;
-import com.example.chat.repositories.LocalUserRepository;
 
 @Service
 public class ImageService {
 
     private CloudinaryService cloudinaryService;
-    private LocalUserRepository localUserRepository;
 
-    public ImageService(CloudinaryService cloudinaryService,
-            LocalUserRepository localUserRepository) {
-        this.localUserRepository = localUserRepository;
+    public ImageService(CloudinaryService cloudinaryService) {
+
         this.cloudinaryService = cloudinaryService;
     }
 
     @SuppressWarnings("rawtypes")
-    public void uploadImage(MultipartFile image, LocalUser user) throws IOException {
+    public LocalUser uploadImage(MultipartFile image, LocalUser user) throws IOException {
         if (image == null) {
             throw new CustomException("Image is required", HttpStatus.BAD_REQUEST);
         }
         try {
-
             BufferedImage bi = ImageIO.read(image.getInputStream());
             if (bi == null) {
                 throw new CustomException("Invalid image file", HttpStatus.BAD_REQUEST);
@@ -44,12 +40,12 @@ public class ImageService {
             user.setImageId(result.get("public_id").toString());
             user.setImageUrl(result.get("url").toString());
 
-            localUserRepository.save(user);
+            return user;
 
         } catch (CustomException e) {
             throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-
+            return user;
         }
     }
 
