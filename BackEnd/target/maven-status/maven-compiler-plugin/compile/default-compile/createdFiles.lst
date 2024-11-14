@@ -15,7 +15,6 @@ com\example\chat\security\SecurityConfig.class
 com\example\chat\services\RoleService.class
 com\example\chat\dtos\UpdateMessageStatusDto.class
 com\example\chat\mappers\TextMessageMapper.class
-com\example\chat\models\LocalUser$LocalUserBuilder.class
 com\example\chat\services\LocalUserService.class
 com\example\chat\services\LoginService.class
 com\example\chat\controllers\LocalUserController.class
