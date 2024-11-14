@@ -40,4 +40,19 @@ export class ApiService {
     );
   }
   /************************************************************************************************* */
+  forgetPassword(
+    email: string,
+    password: string,
+    confirmPassword: string
+  ): Observable<MyResponse<null>> {
+    return this.http.post<MyResponse<null>>(
+      'http://localhost:8080/api/forget-password',
+      {
+        email,
+        password,
+        confirmPassword,
+      }
+    );
+  }
+  /************************************************************************************************* */
 }

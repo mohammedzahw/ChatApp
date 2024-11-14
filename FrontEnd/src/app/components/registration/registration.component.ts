@@ -34,9 +34,10 @@ export class RegistrationComponent {
         Validators.pattern(/(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[^a-zA-Z]).{8,}/),
       ]),
       about: new FormControl(''),
+      checkbox: new FormControl(false),
     });
   }
-  isCkecked: boolean = true;
+  isCkecked: boolean = false;
   file!: File;
   imageUrl: string | ArrayBuffer | null = null;
   isLoading: boolean = false;
@@ -56,11 +57,16 @@ export class RegistrationComponent {
     }
     console.log(this.imageUrl);
   }
+  onCheckboxClick() {
+    this.form.get('checkbox')?.markAsTouched();
+    if (this.form.get('checkbox')?.value)
+      this.form.get('checkbox')?.setValue(false);
+    else this.form.get('checkbox')?.setValue(true);
+  }
 
   signUp() {
-    if (this.form.invalid || !this.isCkecked) {
+    if (this.form.invalid || !this.form.get('checkbox')?.value) {
       this.form.markAllAsTouched();
-      this.isCkecked = false;
       return;
     }
     this.isLoading = true;

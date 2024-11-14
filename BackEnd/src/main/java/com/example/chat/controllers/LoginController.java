@@ -78,12 +78,13 @@ public class LoginController {
             return Validator.validate(result);
         }
 
-        LocalUser LocalUser = localUserRepository.findByEmail(changePasswordRequest.getEmail()).orElse(null);
+        LocalUser LocalUser = localUserRepository.findByEmail(changePasswordRequest.getEmail()).orElseThrow(
+                () -> new CustomException("User not found", HttpStatus.NOT_FOUND));
         if (!LocalUser.getActive()) {
             signUpService.sendRegistrationVerificationCode(changePasswordRequest.getEmail(), request,
                     tokenUtil.generateToken(changePasswordRequest.getEmail(), LocalUser.getId(), 900));
 
-            return new Response(HttpStatus.OK, null, "Activation link sent to your email");
+            return new Response(HttpStatus.OK, null, "This email is not verified, Activation link sent to your email");
         }
         loginService.sendResetpasswordEmail(changePasswordRequest.getEmail(), request,
                 tokenUtil.generateToken(changePasswordRequest.getEmail() + "," + changePasswordRequest.getPassword(),
