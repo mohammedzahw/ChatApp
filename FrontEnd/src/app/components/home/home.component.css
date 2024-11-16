@@ -1,7 +1,43 @@
+.container {
+  margin: auto;
+  border: 1px solid #dcdcdc;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.sidebar {
+  background-color: #d3d3d3;
+  height: 100vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  & i {
+    font-size: 60px;
+  }
+  & i:hover {
+    cursor: pointer;
+  }
+
+  & img {
+    width: 90%;
+    max-width: 50px;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    margin-left: 5%;
+    margin-bottom: 5px;
+    /* object-fit: cover; */
+  }
+
+  & img:hover {
+    cursor: pointer;
+  }
+}
+
 .chat-list {
   overflow-y: scroll;
   overflow-x: hidden;
-  height: 80vh;
+  height: 82vh;
   &::-webkit-scrollbar {
     display: none;
   }
@@ -15,7 +51,7 @@
   /* border-bottom: 2px solid black; */
   position: static;
   padding: 5px;
-  background-color: #1E90FF;
+  background-color: #4169e1;
 
   & img {
     width: 70px;
@@ -24,61 +60,53 @@
   }
 }
 .search {
-  border-bottom: 1px solid #DCDCDC;
+  border-bottom: 1px solid #dcdcdc;
 
   .searchChat {
-    background-color: #D3D3D3;
+    background-color: #d3d3d3;
     height: 40px;
     width: 70%;
     display: flex;
     align-items: center;
     text-align: center;
     padding: 5px;
-    border: 1px solid #DCDCDC;
+    border: 1px solid #dcdcdc;
     margin: auto;
     margin-top: 20px;
     margin-bottom: 20px;
 
     & input {
-      background-color: #D3D3D3;
+      background-color: #d3d3d3;
       border: none;
       outline: none;
       padding: 5px;
       autocomplete: off;
-
     }
   }
 }
 
-
 .search-result {
-  /* display: flex;
-  height: 500px; */
-  position: absolute;
-  top: 150px;
-  left: 0;
-  width: inherit;
+  transition:  height 1s ease-in-out;
   background-color: #fff;
   box-sizing: border-box;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
   z-index: 1;
-  max-height: 300px;
+  max-height: 500px;
   overflow-y: scroll;
   -ms-overflow-style: none;
   scrollbar-width: none;
   & .user {
     cursor: pointer;
-    padding: 0;
+    padding-top: 5px;
+    padding-bottom: 5px;
     margin: 0;
     display: flex;
     flex-direction: row;
     align-items: center;
     font-size: large;
-    border: 1px solid black;
-    border-radius: 10px;
-    margin-bottom: 1px;
-
+    border-bottom: 1px solid black;
+    margin-bottom: 5px;
 
     gap: 10px;
     & img {
@@ -88,6 +116,115 @@
     }
   }
 }
-.chat-room {
-  background-color: #F0F8FF;
+.chat-room-cont
+{
+
+  background-color: #f0f8ff;
+}
+
+
+@media (min-width: 1000px) {
+  .sidebar {
+    display: none;
+  }
+}
+@media (max-width: 1000px) {
+  .chat-room {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .container
+  {
+    margin: 0;
+  }
+  .sidebar i {
+    font-size: 40px;
+  }
+
+  .head {
+    & img {
+      width: 50px;
+      height: 50px;
+    }
+  }
+  .search {
+    .searchChat {
+      height: 30px;
+      width: 70%;
+      margin-top: 15px;
+      margin-bottom: 15px;
+      & input {
+        height: 30px;
+      }
+    }
+  }
+}
+@media (max-width: 455px) {
+  .sidebar i {
+    font-size: 35px;
+  }
+  .head {
+    & img {
+      width: 45px;
+      height: 45px;
+    }
+  }
+  .search {
+    .searchChat {
+      width: 60%;
+      margin-top: 15px;
+      margin-bottom: 15px;
+      height: 30px;
+      /* width: 70%; */
+      & input {
+        height: 30px;
+      }
+    }
+  }
+}
+@media (max-width: 400px) {
+  .sidebar i {
+    font-size: 30px;
+  }
+  .head {
+    & img {
+      width: 40px;
+      height: 40px;
+    }
+  }
+  .search {
+    .searchChat {
+      width: 60%;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      height: 20px;
+      & input {
+        height: 20px;
+      }
+    }
+  }
+}
+@media (max-width: 300px) {
+  .sidebar i {
+    font-size: 25px;
+  }
+  .head {
+    & img {
+      width: 40px;
+      height: 40px;
+    }
+  }
+  .search {
+    margin: 0;
+    .searchChat {
+      margin: 20px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      height: 20px;
+      & input {
+        height: 20px;
+      }
+    }
+  }
 }

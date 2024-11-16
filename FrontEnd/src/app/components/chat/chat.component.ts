@@ -17,31 +17,6 @@ export class ChatComponent {
   user: User | null = {} as User;
 
   constructor(private dataService: DataService) {
-    // this.chat = {
-    //   id: 0,
-    //   name: 'Mohammed Reda',
-    //   imageUrl: 'assets/images/download (1).jpeg',
-    //   numberOfUreadMessages: 10,
-    //   lastMessage: {
-    //     id: 0,
-    //     chatId: 0,
-    //     content: 'Hello My Friend',
-    //     status: MessageStatus.SENT,
-    //     sendDateTime: new Date(),
-    //     senderId: 0,
-    //     receiveDateTime: new Date(),
-    //     receiverId: 0,
-    //   },
-    //   lastUpdated: new Date(),
-    // };
-    // this.user = {
-    //   id: 0,
-    //   name: 'Ahmed Reda',
-    //   about: "I'm a web developer",
-    //   online: true,
-    //   imageUrl: '/FrontEnd/public/assets/images/download (2).jpeg',
-    //   email: 'o8Lg5@example.com',
-    // };
   }
 
   async ngOnInit() {

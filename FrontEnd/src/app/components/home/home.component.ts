@@ -19,7 +19,8 @@ export class HomeComponent {
   user: User = {} as User;
   opendChat: Chat = {} as Chat;
   searchResult: User[] = [];
-
+  hideChats: boolean = false;
+  hideChat: boolean = true;
   /*************************************************************** */
 
   constructor(
@@ -45,6 +46,7 @@ export class HomeComponent {
   /*************************************************************** */
   //open chat
   openUserChat(searchUser: User) {
+    this.hideChat = false;
     console.log('searchUser', searchUser);
     this.apiService.searchChat(searchUser.id).subscribe((res) => {
       this.opendChat = res.data;
@@ -53,6 +55,15 @@ export class HomeComponent {
   }
   /*************************************************************** */
   press(chat: Chat) {
+    const isLargeScreen = window.matchMedia('(min-width: 1000px)').matches;
+
+    if (!isLargeScreen) {
+      this.hideChats = true;
+      this.hideChat = false;
+    } else {
+      this.hideChats = false;
+      this.hideChat = false;
+    }
     this.opendChat = chat;
   }
   /*************************************************************** */
@@ -97,4 +108,8 @@ export class HomeComponent {
     }
   }
   /*************************************************************** */
+  displayChats() {
+    this.hideChats = !this.hideChats;
+    this.hideChat = !this.hideChats;
+  }
 }

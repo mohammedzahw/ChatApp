@@ -9,13 +9,18 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    height: 85vh;
+    height: 82%;
     overflow-x: hidden;
     overflow-y: scroll;
 
     -ms-overflow-style: none;
     scrollbar-width: none;
-
+  }
+  @media (max-width:760px) {
+    .messages
+    {
+      height: 85%;
+    }
   }
   .messages::-webkit-scrollbar {
     /* For WebKit browsers */
@@ -24,7 +29,8 @@
 
   & .header {
     margin-bottom: 5px;
-    background-color: #1E90FF;
+   height: 80px;
+    background-color: #1e90ff;
     width: 100%;
     display: flex;
     position: static;
@@ -32,56 +38,125 @@
     padding: 5px;
     gap: 10px;
     align-items: center;
-    /* border-radius: 10px; */
     & img {
+
       width: 70px;
       height: 70px;
+
+      aspect-ratio: 1 / 1;
       border-radius: 50%;
     }
     & h2 {
       font-size: 28px;
     }
-    & i {
-      cursor: pointer;
-      font-size: 40px;
-      align-items: flex-end;
-    }
-    & i:hover {
-      /* color: red;
-     */
-      background-color: red;
-    }
+
   }
 
   & .message {
     position: static;
-    margin-left: 10%;
-    width: 80%;
+    margin-left: 15%;
+    width: 70%;
     display: grid;
     grid-template-columns: 10fr 1fr;
-    height: 50px;
-    border: 1px solid #DCDCDC;
+    height: 40px;
+    border: 1px solid #dcdcdc;
     border-radius: 10px;
     background-color: white;
     padding-left: 10px;
 
-
     & i {
+      position: relative;
+      left: -5px;
       cursor: pointer;
-      font-size: xx-large;
+      font-size: x-large;
       justify-content: center;
       text-align: center;
       rotate: 45deg;
-      color: #1E90FF;
+      color: #1e90ff;
     }
 
     & input {
-      font-size: large;
+      font-size: medium;
       outline: none;
 
       border: none;
       border-radius: 10px;
     }
+  }
+
+  @media  (max-width: 760px) {
+    .message {
+      height: 30px;
+      & input {
+        font-size: 15px;
+      }
+      & i {
+        font-size: medium;
+      }
+    }
+  }
+  @media  (max-width: 350px) {
+    .message {
+      height: 30px;
+      & input {
+        font-size: 15px;
+      }
+      & i {
+       left: -15px;
+      }
+    }
+  }
+
+
+
+  .head {
+    & .name {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    & .img {
+      padding-right: 10px;
+    }
+    & .unread {
+      width: 20px;
+      height: 16px;
+    }
+  }
+
+  .message {
+    & .text {
+      font-size: 14px;
+    }
+    & .date {
+      font-size: 14px;
+    }
+  }
+}
+@media (max-width: 760px) {
+ .chat .header
+  {
+    height: 60px;
+    & img
+    {
+    height: 50px;
+    width: 50px;
+    }
+    & h2 {
+      font-size: 20px;
+    }
+  }
+}
+@media (max-width: 400px) {
+ .chat .header
+  {
+    height: 50px;
+    & img
+    {
+    height: 40px;
+    width: 40px;
+    }
 
   }
 }
+
