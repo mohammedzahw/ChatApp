@@ -59,6 +59,7 @@ export class ForgetPasswordComponent {
           this.router.navigate(['/login']);
         }
       });
+    this.isLoading = false;
   }
   passwordMatchValidator = Validators.compose([
     (control: AbstractControl): { passwordMismatch: boolean } | null => {

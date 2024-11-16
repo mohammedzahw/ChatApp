@@ -1,1 +1,43 @@
-<p>home works!</p>
+<div class="container-fluid">
+  <div class="parent row">
+
+    <div class="chats col-md-3">
+      <div class="head">
+        <img src="{{ user.imageUrl }}" alt="">
+      </div>
+      <div class="search">
+        <div class="searchChat">
+          <i class="bi bi-search"></i>
+          <input type="text" (keyup)="search($event)" name="search" #key id="" placeholder="search chat" />
+        </div>
+      </div>
+
+
+      <div class="search-result">
+        @for (user of searchResult; track $index) {
+
+        <div class="user" (click)="openUserChat(user)">
+          <img src="{{ user.imageUrl }}" alt="" />
+          <p>{{ user.name }}</p>
+        </div>
+        }
+      </div>
+      <div class="chat-list">
+        <div class="chat-list" [style.display]="(key.value.length ===0  ? 'block' : 'none')">
+          @for (chat of chats; track $index) {
+
+          <div class="chat" (click)="press(chat)">
+            <app-chat [chat]="chat"></app-chat>
+          </div>
+          }
+        </div>
+
+      </div>
+    </div>
+    <div class="chat-room col-md-9" [style.display]="opendChat.id ? 'block' : 'none'" (click)="press(opendChat)">
+      <app-chat-room [chat]="opendChat"></app-chat-room>
+    </div>
+
+  </div>
+</div>
+

@@ -1,1 +1,27 @@
-<p>message works!</p>
+<div class="message-container" [ngClass]="{ 'left': message.senderId !== user?.id }">
+
+  <div class="message ">
+
+    <div class="content">
+      {{ message.content }}
+    </div>
+    <div class="time">
+      @if (message.senderId === user?.id) {
+      {{ message.sendDateTime | date : "EEEE HH:mm" }}
+      }
+      @else {
+      {{ message.receiveDateTime | date : "EEEE HH:mm" }}
+      }
+    </div>
+    <div>
+      @if(message.status === 'SENT'){
+      <i class="bi bi-check"></i>
+      }
+      @else {
+      <i class="bi bi-check-all" [style.color]="message.status === 'READ' ? '#1E90FF' : 'black'"></i>
+      }
+    </div>
+  </div>
+
+
+</div>

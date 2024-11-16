@@ -1,1 +1,17 @@
-<p>chat-room works!</p>
+<div class="chat" #chatContainer>
+  <div class="header">
+    <img src="{{ chat.imageUrl }}" alt="" width="50" height="50" />
+    <h2>{{ chat.name }}</h2>
+  </div>
+  <div class="messages" #messagesContainer>
+    @for(msg of chatMessages; track $index) {
+
+    <app-message [message]="msg"></app-message>
+
+    }
+  </div>
+  <div class="message">
+    <input type="text" [(ngModel)]="message" name="message" id="" autocomplete="off" />
+    <i class="bi bi-send-fill" (click)="send(chat.id)"></i>
+  </div>
+</div>

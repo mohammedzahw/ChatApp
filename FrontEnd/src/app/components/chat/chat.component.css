@@ -1,0 +1,55 @@
+.chat {
+  padding: 10px;
+  width: 100%;
+  cursor: pointer;
+  border-bottom: 1px solid #DCDCDC;
+
+  overflow: hidden;
+  * {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.head {
+
+  & .name {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  & img {
+    object-fit: cover;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+  }
+  & .unread {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #1E90FF;
+    margin: auto;
+    text-align: center;
+
+  }
+}
+
+.chat:hover {
+  background-color: #1E90FF;
+}
+
+.message {
+
+  & .text {
+    font-size: 16px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  & .date {
+    text-align: end;
+    font-size: 15px;
+
+  }
+
+}

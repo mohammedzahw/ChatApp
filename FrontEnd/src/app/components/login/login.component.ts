@@ -49,5 +49,6 @@ export class LoginComponent {
           this.router.navigate(['/home']);
         }
       });
+      this.isLoading = false;
   }
 }

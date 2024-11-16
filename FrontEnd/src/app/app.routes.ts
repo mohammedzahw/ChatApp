@@ -4,13 +4,14 @@ import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegistrationComponent } from './components/registration/registration.component';
 import { ForgetPasswordComponent } from './components/forget-password/forget-password.component';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  {
-    path: '',
-    redirectTo: 'login',
-    pathMatch: 'full',
-  },
+  // {
+  //   path: '',
+  //   redirectTo: 'login',
+  //   pathMatch: 'full',
+  // },
 
   {
     path: 'login',
@@ -27,9 +28,12 @@ export const routes: Routes = [
   {
     path: 'home',
     component: HomeComponent,
+    canActivate: [AuthGuard],
   },
   {
     path: `chat/:chatId`,
     component: ChatComponent,
+    canActivate: [AuthGuard],
   },
+
 ];
