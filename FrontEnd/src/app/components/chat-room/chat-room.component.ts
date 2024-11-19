@@ -8,16 +8,16 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { DataService } from '../../services/data.service';
 
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Chat } from '../../models/Chat';
 import { Message } from '../../models/Message';
 import { MessageStatus } from '../../models/MessageStatus';
 import { User } from '../../models/User';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { MessageComponent } from '../message/message.component';
 
 @Component({
@@ -33,11 +33,14 @@ export class ChatRoomComponent implements OnInit, OnChanges, AfterViewInit {
   chat: Chat = {} as Chat;
   user: User | null = {} as User;
   message: string = '';
+  display: boolean = false;
   /*************************************************************************** */
   constructor(
     private apiService: ApiService,
-    private dataService: DataService
+    private dataService: DataService,
+    private router: Router
   ) {}
+
   /*************************************************************************** */
   @ViewChild('messagesContainer') private messagesContainer: ElementRef =
     {} as ElementRef;
@@ -57,42 +60,26 @@ export class ChatRoomComponent implements OnInit, OnChanges, AfterViewInit {
       this.messagesContainer.nativeElement.scrollHeight;
   }
   /*************************************************************************** */
-  async ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges) {
+    this.display = false;
+    // if the chat is changed
     if (changes && changes['chat'].currentValue) {
       this.message = '';
       this.chat = changes['chat'].currentValue;
-      if (this.chat.numberOfUreadMessages > 0) {
-        this.chat.numberOfUreadMessages = 0;
-        await firstValueFrom(this.apiService.readChatMessages(this.chat.id));
-      }
-      this.dataService
-        .getChatMessagesByChatId(this.chat.id)
-        .then((messages) => {
-          this.chatMessages = messages;
-          // this.chatMessages.reverse();
-        });
-
-      // console.log(this.chat);
+      this.ngOnInit();
     }
   }
+
   /*************************************************************************** */
   async ngOnInit() {
-    //get the current user
-    this.dataService.chatMessagesSubject.subscribe((notify) => {
-      if (notify.messageStatus === MessageStatus.READ) {
-        this.chat.numberOfUreadMessages = 0;
-      }
-      if (notify.chatId === this.chat.id) {
-        for (let i = 0; i < this.chatMessages.length; i++) {
-          if (this.chatMessages[i].status !== MessageStatus.READ) {
-            this.chatMessages[i].status = notify.messageStatus;
-            this.chatMessages[i].receiveDateTime = new Date();
-          }
-        }
-      }
+    this.dataService.chatMessagesSubject.subscribe((chatMessages) => {
+      if (chatMessages.chatId === this.chat.id)
+        this.chatMessages = chatMessages.messages;
+      // console.log(this.chatMessages);
     });
-    this.user = await this.dataService.getUser();
 
+    await this.dataService.getChatMessagesByChatId(this.chat.id);
+    this.user = await this.dataService.getUser();
     //subscribe to the new messages
     this.dataService.messageSubject.subscribe((message) => {
       // if the new message is for the current chat
@@ -100,20 +87,22 @@ export class ChatRoomComponent implements OnInit, OnChanges, AfterViewInit {
         //change the status to read and the receive date time to now
         message.status = MessageStatus.READ;
         message.receiveDateTime = new Date();
-        this.chat.numberOfUreadMessages = -1;
-
-        this.dataService.updateChats(message);
-        //push the message to the chat messages
-        this.dataService.pushToChatsMessages(message);
-        //set the chat messages in the data service
-        this.apiService.updateTextMessage(
-          message.id,
-          message.status,
-          message.receiveDateTime
-        );
+        this.chat.numberOfUreadMessages = 0;
+        //update the status of the message
+        this.dataService.updateMessageStatus({
+          chatId: message.chatId,
+          messageId: message.id,
+          messageStatus: MessageStatus.READ,
+        });
+        //update the message in the backend
+        this.apiService
+          .updateTextMessage(
+            message.id,
+            message.status,
+            message.receiveDateTime
+          )
+          .subscribe((res) => {});
       }
-
-      // }
     });
   }
   /*************************************************************************** */
@@ -125,7 +114,7 @@ export class ChatRoomComponent implements OnInit, OnChanges, AfterViewInit {
         text: this.message,
       })
       .subscribe((res) => {
-        console.log(res);
+        // console.log('res', res);
         this.dataService.pushToChatsMessages(res.data);
         // this.chat.numberOfUreadMessages--;
         this.dataService.updateChats(res.data);
@@ -133,5 +122,20 @@ export class ChatRoomComponent implements OnInit, OnChanges, AfterViewInit {
       });
   }
 
+  /**************************************************************************** */
+  displayOptions() {
+    this.display = !this.display;
+  }
+  /**************************************************************************** */
+  clearChat(chatId: number) {
+    this.dataService.clearChat(chatId);
+    this.display = false;
+  }
+  /**************************************************************************** */
+  async deleteChat(chatId: number) {
+    await this.dataService.deleteChat(chatId);
+    this.chat = {} as Chat;
+    this.display = false;
+  }
   /**************************************************************************** */
 }

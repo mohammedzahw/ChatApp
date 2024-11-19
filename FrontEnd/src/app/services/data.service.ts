@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Observable, Subject, firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable, Subject } from 'rxjs';
 import { Chat } from '../models/Chat';
 import { ChatMessages } from '../models/ChatMessages';
 import { Message } from '../models/Message';
@@ -17,14 +17,14 @@ export class DataService {
   private user: User = {} as User;
   chatsSubject: Subject<Chat[]> = new Subject<Chat[]>();
   messageSubject: Subject<Message> = new Subject<Message>();
-  chatMessagesSubject: Subject<UpdateMessageStatusNotification> =
-    new Subject<UpdateMessageStatusNotification>();
+  chatMessagesSubject: Subject<ChatMessages> = new Subject<ChatMessages>();
   chatsMessages: ChatMessages[] = [];
-  private chatsDto: Chat[] = [];
+  public chatsDto: Chat[] = [];
   /**************************************************** */
   constructor(private apiService: ApiService) {
     this.OnInit();
   }
+
   async OnInit() {
     this.user = await this.getUser();
   }
@@ -33,10 +33,9 @@ export class DataService {
     const userString = localStorage.getItem('user');
     let user = {} as User;
     if (!userString) {
-      await this.apiService.getCurrentUser().subscribe((res) => {
-        this.user = res.data;
-        localStorage.setItem('user', JSON.stringify(this.user));
-      });
+      const res = await firstValueFrom(this.apiService.getCurrentUser());
+      this.user = res.data;
+      localStorage.setItem('user', JSON.stringify(this.user));
     } else {
       user = JSON.parse(userString);
     }
@@ -49,14 +48,15 @@ export class DataService {
   }
 
   /***************************************************************** */
+
+  // //push message to the chat
   pushToChatsMessages(message: Message) {
-    let index = this.chatsMessages.findIndex(
-      (chat) => chat.chatId === message.chatId
-    );
-
-    if (index > -1) this.chatsMessages[index].messages.push(message);
-
-    console.log(this.chatsMessages[index]);
+    this.chatsMessages.forEach((chat) => {
+      if (chat.chatId === message.chatId) {
+        chat.messages.push(message);
+        this.chatMessagesSubject.next(chat);
+      }
+    });
   }
   /*********************************************************************** */
   getChats(): Observable<Chat[]> {
@@ -66,8 +66,112 @@ export class DataService {
     this.chatsDto = chats;
   }
   /***************************************************************************************** */
-  setChatMessages(Notification: UpdateMessageStatusNotification) {
-    this.chatMessagesSubject.next(Notification);
+
+  updateMessageStatus(notify: UpdateMessageStatusNotification) {
+    let chatIndex = this.chatsDto.findIndex(
+      (chat) => chat.id === notify.chatId
+    );
+    // console.log('notify', notify);
+    this.chatsMessages.forEach((chat) => {
+      if (chat.chatId === notify.chatId) {
+        chat.messages.map((message) => {
+          if (message.id === notify.messageId) {
+            message.status = notify.messageStatus;
+          }
+        });
+        this.chatMessagesSubject.next(chat);
+      }
+    });
+    this.chatsSubject.next(this.chatsDto);
+  }
+  /*************************************************************************** */
+  deletMessage(notify: UpdateMessageStatusNotification) {
+    //get the chat index in chatsDto list
+    let chatIndex = this.chatsDto.findIndex(
+      (chat) => chat.id === notify.chatId
+    );
+    //loop through chatsMessages if find the chat delete the message from it and check if the message is read
+    for (let i = 0; i < this.chatsMessages.length; i++) {
+      if (this.chatsMessages[i].chatId === notify.chatId) {
+        let isMessageRead = true;
+        this.chatsMessages[i].messages = this.chatsMessages[i].messages.filter(
+          (message) => {
+            if (message.id === notify.messageId) {
+              if (message.status !== MessageStatus.READ) isMessageRead = false;
+              return false;
+            }
+            return true;
+          }
+        );
+
+        if (!isMessageRead) {
+          this.chatsDto[chatIndex].numberOfUreadMessages--;
+        }
+
+        //update last message
+
+        if (this.chatsDto[chatIndex].lastMessage.id === notify.messageId) {
+          if (this.chatsMessages[i].messages.length > 0) {
+            this.chatsDto[chatIndex].lastMessage =
+              this.chatsMessages[i].messages.slice(-1)[0];
+          } else {
+            this.chatsDto[chatIndex].lastMessage = {} as Message;
+          }
+        }
+        this.chatsSubject.next(this.chatsDto);
+        this.chatMessagesSubject.next(this.chatsMessages[i]);
+        break;
+      }
+    }
+  }
+
+  /*************************************************************************** */
+  deleteCurrentChat(notify: UpdateMessageStatusNotification) {
+    let chatIndex = this.chatsMessages.findIndex(
+      (chat) => chat.chatId === notify.chatId
+    );
+
+    this.chatsDto = this.chatsDto.filter((chat) => chat.id !== notify.chatId);
+
+    this.chatsMessages = this.chatsMessages.filter(
+      (chat) => chat.chatId !== notify.chatId
+    );
+    this.chatsSubject.next(this.chatsDto);
+    this.chatMessagesSubject.next(this.chatsMessages[chatIndex]);
+  }
+  /***************************************************************************************** */
+  clearCurrentChat(notify: UpdateMessageStatusNotification) {
+    let chatIndex = this.chatsDto.findIndex(
+      (chat) => chat.id === notify.chatId
+    );
+
+    this.chatsMessages.map((chat) => {
+      if (chat.chatId === notify.chatId) {
+        chat.messages = [];
+        this.chatMessagesSubject.next(chat);
+      }
+    });
+    this.chatsDto[chatIndex].lastMessage = {} as Message;
+    this.chatsSubject.next(this.chatsDto);
+  }
+  /***************************************************************************************** */
+  setChatMessages(notify: UpdateMessageStatusNotification) {
+    if (notify.messageId !== -1) {
+      if (notify.messageStatus === MessageStatus.DELETED) {
+        this.deletMessage(notify);
+      } else {
+        this.updateMessageStatus(notify);
+      }
+    } else {
+      // console.log('notify', notify);
+      if (notify.messageStatus === MessageStatus.DELETED) {
+        this.deleteCurrentChat(notify);
+      } else if (notify.messageStatus === MessageStatus.CLEAR) {
+        this.clearCurrentChat(notify);
+      } else {
+        this.UpdateChatMessages(notify);
+      }
+    }
   }
   /***************************************************************************************** */
   getChatMessages(chatId: number): Observable<MyResponse<Message[]>> {
@@ -75,53 +179,57 @@ export class DataService {
   }
   /***************************************************************************************** */
   receiveUserMessages() {
-    this.apiService.receiveUserMessages().subscribe((res) => {});
+    this.apiService.receiveUserMessages().subscribe((res) => {
+    });
   }
   /***************************************************************************************** */
-  async getChatMessagesByChatId(chatId: number): Promise<Message[]> {
-    if (!chatId) return [];
-    let messages: Message[] = [];
+  async getChatMessagesByChatId(chatId: number) {
+    if (!chatId) return;
+
     let index = this.chatsMessages.findIndex((chat) => chat.chatId === chatId);
-    console.log(index);
-    if (index > -1) {
-      messages = this.chatsMessages[index].messages;
-    } else {
-      console.log(chatId);
+
+    if (index == -1) {
       let res = await firstValueFrom(this.getChatMessages(chatId));
-      console.log(res);
       this.chatsMessages.push({
         chatId: chatId,
         messages: res.data,
       });
-      messages = res.data;
+      this.chatMessagesSubject.next(this.chatsMessages.slice(-1)[0]);
+    } else {
+      this.chatMessagesSubject.next(this.chatsMessages[index]);
     }
-    return messages;
   }
   /***************************************************************************************** */
   updateChats(lastMessage: Message) {
-    for (let index = 0; index < this.chatsDto.length; index++) {
-      if (this.chatsDto[index].id === lastMessage.chatId) {
-        let newChat = this.chatsDto[index];
-        newChat.lastMessage = lastMessage;
-        newChat.lastUpdated = new Date(lastMessage.sendDateTime);
+    this.chatsDto.map((chat) => {
+      if (chat.id === lastMessage.chatId) {
+        chat.lastMessage = lastMessage;
+        chat.lastUpdated = new Date(lastMessage.sendDateTime);
         if (this.user.id !== lastMessage.senderId) {
-          newChat.numberOfUreadMessages++;
+          chat.numberOfUreadMessages++;
         }
-        this.chatsDto.splice(index, 1);
-        this.chatsDto.unshift(newChat);
-        this.chatsSubject.next(this.chatsDto);
-        break;
       }
-    }
+    });
   }
+
   /***************************************************************************************** */
+  // receive Message from server
+
   pushMessage(message: Message) {
-    console.log(message.receiverId);
-    console.log(this.user.id);
+    // if the Current user is the receiver
     if (message.receiverId === this.user.id) {
       message.status = MessageStatus.RECEIVED;
       message.receiveDateTime = new Date();
+      this.chatsMessages.forEach((chat) => {
+        if (chat.chatId === message.chatId) {
+          chat.messages.push(message);
+          this.chatMessagesSubject.next(chat);
+        }
+      });
+      // console.log(this.chatsMessages);
       this.updateChats(message);
+
+      //send message to the current chat
       this.messageSubject.next(message);
 
       this.apiService
@@ -130,7 +238,6 @@ export class DataService {
           console.log(res);
         });
     }
-    // this.messageSubject.next(message);
   }
   /***************************************************************************************** */
   createChat(chat: Chat) {
@@ -139,6 +246,55 @@ export class DataService {
     }
     this.chatsDto.unshift(chat);
     this.chatsSubject.next(this.chatsDto);
+  }
+  /***************************************************************************************** */
+
+  /***************************************************************************************** */
+  deleteChat(chatId: number) {
+    this.apiService.deleteChat(chatId).subscribe((res) => {
+      this.deleteCurrentChat({
+        chatId: chatId,
+        messageId: -1,
+        messageStatus: MessageStatus.DELETED,
+      });
+    });
+  }
+  /***************************************************************************************** */
+  clearChat(chatId: number) {
+    this.apiService.deleteChatMessages(chatId).subscribe((res) => {
+      this.clearCurrentChat({
+        chatId: chatId,
+        messageId: -1,
+        messageStatus: MessageStatus.DELETED,
+      });
+    });
+  }
+  /***************************************************************************************** */
+  deleteMessage(messageId: number, chatId: number) {
+    this.apiService.deleteMessage(messageId).subscribe((res) => {
+      this.deletMessage({
+        chatId: chatId,
+        messageId: messageId,
+        messageStatus: MessageStatus.DELETED,
+      });
+    });
+  }
+  /***************************************************************************************** */
+
+  // read chat message in the client
+  UpdateChatMessages(notify: UpdateMessageStatusNotification) {
+    if (!notify) return;
+    // console.log('notify', notify);
+
+    this.chatsMessages.forEach((chat) => {
+      if (chat.chatId === notify.chatId) {
+        chat.messages.forEach((message) => {
+          message.status = notify.messageStatus;
+          message.receiveDateTime = new Date();
+        });
+        this.chatMessagesSubject.next(chat);
+      }
+    });
   }
   /***************************************************************************************** */
 }

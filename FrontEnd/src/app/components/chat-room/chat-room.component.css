@@ -3,8 +3,10 @@
   padding: 0;
   margin: 0;
   height: 100vh;
+  position: relative;
 
   & .messages {
+    position: relative;
     margin-left: 5px;
     width: 100%;
     display: flex;
@@ -16,9 +18,8 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  @media (max-width:760px) {
-    .messages
-    {
+  @media (max-width: 760px) {
+    .messages {
       height: 85%;
     }
   }
@@ -28,28 +29,62 @@
   }
 
   & .header {
-    margin-bottom: 5px;
-   height: 80px;
+    height: 80px;
     background-color: #1e90ff;
     width: 100%;
     display: flex;
+    justify-content: space-between;
     position: static;
     flex-direction: row;
     padding: 5px;
     gap: 10px;
     align-items: center;
-    & img {
+    & .info {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      align-items: center;
+      & img {
+        width: 70px;
+        height: 70px;
 
-      width: 70px;
-      height: 70px;
-
-      aspect-ratio: 1 / 1;
-      border-radius: 50%;
+        aspect-ratio: 1 / 1;
+        border-radius: 50%;
+      }
+      & h2 {
+        font-size: 28px;
+      }
     }
-    & h2 {
-      font-size: 28px;
+    & i {
+      font-size: x-large;
+      position: relative;
+      left: -10px;
+      cursor: pointer;
     }
-
+    & i:hover {
+      background-color: #dcdcdc;
+    }
+  }
+  & ul
+  {
+    position: absolute;
+    left:84%;
+    font-size: medium;
+    background-color: #dcdcdc;
+    border-radius: 10px;
+    list-style: none;
+    padding:10px 0;
+    margin: 0;
+    width: 15%;
+    & li
+    {
+     padding: 5px;
+      cursor: pointer;
+    }
+    & li:hover
+    {
+      background-color: #1e90ff;
+    }
   }
 
   & .message {
@@ -84,7 +119,7 @@
     }
   }
 
-  @media  (max-width: 760px) {
+  @media (max-width: 760px) {
     .message {
       height: 30px;
       & input {
@@ -95,19 +130,17 @@
       }
     }
   }
-  @media  (max-width: 350px) {
+  @media (max-width: 350px) {
     .message {
       height: 30px;
       & input {
         font-size: 15px;
       }
       & i {
-       left: -15px;
+        left: -15px;
       }
     }
   }
-
-
 
   .head {
     & .name {
@@ -134,13 +167,11 @@
   }
 }
 @media (max-width: 760px) {
- .chat .header
-  {
+  .chat .header {
     height: 60px;
-    & img
-    {
-    height: 50px;
-    width: 50px;
+    & img {
+      height: 50px;
+      width: 50px;
     }
     & h2 {
       font-size: 20px;
@@ -148,15 +179,11 @@
   }
 }
 @media (max-width: 400px) {
- .chat .header
-  {
+  .chat .header {
     height: 50px;
-    & img
-    {
-    height: 40px;
-    width: 40px;
+    & img {
+      height: 40px;
+      width: 40px;
     }
-
   }
 }
-

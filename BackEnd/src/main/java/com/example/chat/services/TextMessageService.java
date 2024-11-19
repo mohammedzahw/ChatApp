@@ -33,7 +33,6 @@ public class TextMessageService {
 
         private TextMessageRepository textMessageRepository;
         private LocalUserRepository localUserRepository;
-        // private ProduceMessageService produceMessageService;
         private TokenUtil tokenUtil;
 
         private ChatRepository chatRepository;
@@ -53,93 +52,6 @@ public class TextMessageService {
                 this.textMessageMapper = textMessageMapper;
                 this.textMessageRepository = textMessageRepository;
                 this.localUserRepository = localUserRepository;
-
-        }
-
-        /******************************************************************************* */
-        public void setMessageStatusToRead(Integer messageId) {
-                try {
-                        TextMessage message = getMessageById(messageId);
-                        message.setStatus(MessageStatus.READ);
-
-                        textMessageRepository.save(message);
-
-                        Integer chatId = getChatId(messageId);
-
-                        sendToSocket(chatId, MessageStatus.READ, message.getSender().getId());
-
-                } catch (Exception e) {
-                        throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND);
-                }
-
-        }
-
-        /******************************************************************************* */
-        public void receiveMessage(Integer messageId) {
-                try {
-                        TextMessage message = getMessageById(messageId);
-                        message.setStatus(MessageStatus.RECEIVED);
-
-                        textMessageRepository.save(message);
-
-                        Integer chatId = getChatId(messageId);
-                        sendToSocket(chatId, MessageStatus.RECEIVED, message.getSender().getId());
-
-                } catch (Exception e) {
-                        throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND);
-                }
-
-        }
-
-        /******************************************************************************* */
-        public void setChatMessagesToRead(Integer chatId) {
-                try {
-                        Integer userId = tokenUtil.getUserId();
-                        textMessageRepository.setChatMessagesToRead(chatId,
-                                        userId);
-
-                        Chat chat = chatRepository.findById(chatId).orElseThrow(
-                                        () -> new CustomException("Chat not found", HttpStatus.NOT_FOUND));
-
-                        LocalUser sender = userId == chat.getUser1().getId() ? chat.getUser2()
-                                        : chat.getUser1();
-
-                        sendToSocket(chatId, MessageStatus.READ, sender.getId());
-
-                } catch (Exception e) {
-                        throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND);
-                }
-        }
-
-        /******************************************************************************* */
-        public void setUserMessagesToReceive() {
-                try {
-                        Integer userId = tokenUtil.getUserId();
-                        textMessageRepository.setUserMessagesToReceive(
-                                        userId);
-                        List<Chat> userChat = chatRepository
-                                        .findChatByUser(userId);
-                        LocalUser sender;
-                        for (Chat chat : userChat) {
-                                sender = userId == chat.getUser1().getId() ? chat.getUser2()
-                                                : chat.getUser1();
-                                sendToSocket(chat.getId(), MessageStatus.RECEIVED,
-                                                sender.getId());
-                        }
-                } catch (Exception e) {
-
-                        throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND);
-                }
-        }
-
-        /******************************************************************************* */
-
-        private void sendToSocket(Integer chatId, MessageStatus messageStatus, Integer senderId) {
-                UpdateMessageStatusDto notify = new UpdateMessageStatusDto(
-                                chatId, messageStatus);
-
-                messagingTemplate.convertAndSend("/topic/messages/" + senderId,
-                                notify);
 
         }
 
@@ -168,6 +80,21 @@ public class TextMessageService {
         public Integer getChatId(Integer messageId) {
 
                 return textMessageRepository.getChatId(messageId);
+        }
+
+        /***************************************************************************************/
+        public void deleteTextMessage(Integer messageId) {
+                try {
+                        // System.out.println("messageId : " + messageId);
+                        TextMessage textMessage = getMessageById(messageId);
+                        Integer chatId = getChatId(messageId);
+                        textMessageRepository.deleteById(messageId);
+
+                        sendToSocket(chatId, messageId, MessageStatus.DELETED,
+                                        textMessage.getReceiver().getId());
+                } catch (Exception e) {
+                        throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND);
+                }
         }
 
         /***************************************************************************************/
@@ -203,6 +130,7 @@ public class TextMessageService {
 
         }
 
+        /***************************************************************************************/
         @Transactional
         public MessageDto updateTextMessageStatus(UpdateTextMessageStatusRequest message) {
                 try {
@@ -219,7 +147,8 @@ public class TextMessageService {
 
                         textMessageRepository.save(textMessage);
 
-                        sendToSocket(chatId, message.getStatus(), textMessage.getSender().getId());
+                        sendToSocket(chatId, message.getMessageId(), message.getStatus(),
+                                        textMessage.getSender().getId());
 
                         return textMessageMapper.toDto(textMessage, getChatId(message.getMessageId()));
                 } catch (Exception e) {
@@ -227,5 +156,58 @@ public class TextMessageService {
                 }
 
         }
+
+        /******************************************************************************* */
+        public void setChatMessagesToRead(Integer chatId) {
+                try {
+                        Integer userId = tokenUtil.getUserId();
+                        textMessageRepository.setChatMessagesToRead(chatId,
+                                        userId);
+
+                        Chat chat = chatRepository.findById(chatId).orElseThrow(
+                                        () -> new CustomException("Chat not found", HttpStatus.NOT_FOUND));
+                        Integer senderId = chat.getUser1().getId().equals(userId) ? chat.getUser2().getId()
+                                        : chat.getUser1().getId();
+
+                        sendToSocket(chatId, -1, MessageStatus.READ, senderId);
+
+                } catch (Exception e) {
+                        throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND);
+                }
+        }
+
+        /******************************************************************************* */
+        public void setUserMessagesToReceive() {
+                try {
+                        Integer userId = tokenUtil.getUserId();
+                        textMessageRepository.setUserMessagesToReceive(
+                                        userId);
+                        List<Chat> userChat = chatRepository
+                                        .findChatByUser(userId);
+                        Integer senderId;
+                        for (Chat chat : userChat) {
+                                senderId = chat.getUser1().getId().equals(userId) ? chat.getUser2().getId()
+                                                : chat.getUser1().getId();
+                                sendToSocket(chat.getId(), -1, MessageStatus.RECEIVED,
+                                                senderId);
+                        }
+                } catch (Exception e) {
+
+                        throw new CustomException(e.getMessage(), HttpStatus.NOT_FOUND);
+                }
+        }
+
+        /******************************************************************************* */
+
+        private void sendToSocket(Integer chatId, Integer messageId, MessageStatus messageStatus, Integer senderId) {
+                UpdateMessageStatusDto notify = new UpdateMessageStatusDto(
+                                chatId, messageId, messageStatus);
+
+                messagingTemplate.convertAndSend("/topic/messages/" + senderId,
+                                notify);
+
+        }
+
+        /******************************************************************************* */
 
 }

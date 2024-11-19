@@ -95,6 +95,7 @@ export class ApiService {
     if (!chatId) {
       return new Observable((observer) => {});
     }
+    // console.log(chatId);
     return this.http.get<MyResponse<null>>(
       `http://localhost:8080/api/chat/read-messages/${chatId}`
     );
@@ -130,13 +131,30 @@ export class ApiService {
   /****************************************************************************************************/
 
   getUserChats(): Observable<Chat[]> {
-
     return this.http.get<Chat[]>('http://localhost:8080/chat/user-chats');
   }
   /****************************************************************************************************/
   searchChat(userId: number): Observable<MyResponse<Chat>> {
     return this.http.get<MyResponse<Chat>>(
       `http://localhost:8080/chat/search-chat/${userId}`
+    );
+  }
+  /****************************************************************************************************/
+  deleteChatMessages(chatId: number): Observable<MyResponse<null>> {
+    return this.http.delete<MyResponse<null>>(
+      `http://localhost:8080/chat/delete-messages/${chatId}`
+    );
+  }
+  /****************************************************************************************************/
+  deleteChat(chatId: number): Observable<MyResponse<null>> {
+    return this.http.delete<MyResponse<null>>(
+      `http://localhost:8080/chat/delete/${chatId}`
+    );
+  }
+  /****************************************************************************************************/
+  deleteMessage(messageId: number): Observable<MyResponse<null>> {
+    return this.http.delete<MyResponse<null>>(
+      `http://localhost:8080/api/text-message/delete/${messageId}`
     );
   }
   /****************************************************************************************************/

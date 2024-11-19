@@ -1,13 +1,19 @@
-<div class="chat" #chatContainer>
+<div class="chat" #chatContainer [style.display]="(chat.id  ? 'block' : 'none')">
   <div class="header">
-    <img src="{{ chat.imageUrl }}" alt="" width="50" height="50" />
-    <h2>{{ chat.name }}</h2>
-  </div>
+    <div class="info">
+      <img src="{{ chat.imageUrl }}" alt="" width="50" height="50" />
+      <h2>{{ chat.name }}</h2>
+      </div>
+    <i class="bi bi-three-dots-vertical" (click)="displayOptions()"></i>
+    </div>
+
   <div class="messages" #messagesContainer>
+<ul [style.display]="(display ? 'block' : 'none')">
+  <li (click)="deleteChat(chat.id)">Delete Chat</li>
+  <li (click)="clearChat(chat.id)">Clear Chat</li>
+</ul>
     @for(msg of chatMessages; track $index) {
-
     <app-message [message]="msg"></app-message>
-
     }
   </div>
   <div class="message">

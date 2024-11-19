@@ -5,6 +5,8 @@
     <div class="content">
       {{ message.content }}
     </div>
+    <i class="bi bi-trash-fill" (click)="deleteMessage()"
+      [style.display]="(message.senderId === user?.id ? 'block' : 'none')"></i>
     <div class="time">
       @if (message.senderId === user?.id) {
       {{ message.sendDateTime | date : "EEEE HH:mm" }}
@@ -13,7 +15,7 @@
       {{ message.receiveDateTime | date : "EEEE HH:mm" }}
       }
     </div>
-    <div>
+    <div class="status" [style.display]="(message.senderId === user?.id ? 'block' : 'none')">
       @if(message.status === 'SENT'){
       <i class="bi bi-check"></i>
       }

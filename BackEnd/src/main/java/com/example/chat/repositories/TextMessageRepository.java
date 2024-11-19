@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.example.chat.models.TextMessage;
 
@@ -39,5 +40,10 @@ public interface TextMessageRepository extends JpaRepository<TextMessage, Intege
     @Transactional
     @Query("UPDATE TextMessage m SET m.status = 'RECEIVED', m.receiveDateTime = CURRENT_TIMESTAMP WHERE (m.receiver.id = :id And m.status = 'SENT')")
     void setUserMessagesToReceive(Integer id);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM TextMessage m WHERE m.chat.id = :chatId")
+    void deleteChatMessages(@Param("chatId") Integer chatId);
 
 }

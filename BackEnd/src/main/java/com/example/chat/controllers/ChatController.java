@@ -5,11 +5,10 @@ import java.util.concurrent.TimeoutException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.chat.services.ChatService;
@@ -30,14 +29,6 @@ public class ChatController {
     }
 
     /********************************************************************************************************/
-    // @PostMapping("/create-chat")
-    // public ResponseEntity<?> createChat(@RequestParam("user2Id") Integer user2Id)
-    // throws IOException, TimeoutException {
-    // return new ResponseEntity<>(chatService.createChatWithUser(user2Id),
-    // HttpStatus.OK);
-    // }
-
-    /********************************************************************************************************/
 
     @GetMapping("/{chatId}")
     public Response getChat(@PathVariable("chatId") Integer chatId) throws IOException, TimeoutException {
@@ -50,6 +41,28 @@ public class ChatController {
     @GetMapping("/user-chats")
     public ResponseEntity<?> getUserChats() throws IOException, TimeoutException {
         return new ResponseEntity<>(chatService.getUserChats(), HttpStatus.OK);
+    }
+
+    /*********************************************************************************************************/
+    @DeleteMapping("delete-messages/{chatId}")
+    public Response deleteChatMessages(@PathVariable("chatId") Integer chatId) {
+        try {
+            chatService.deleteChatMessages(chatId);
+            return new Response(HttpStatus.OK, null, "chat deleted");
+        } catch (Exception e) {
+            return new Response(HttpStatus.BAD_REQUEST, null, e.getMessage());
+        }
+    }
+
+    /*********************************************************************************************************/
+    @DeleteMapping("delete/{chatId}")
+    public Response deleteChat(@PathVariable("chatId") Integer chatId) {
+        try {
+            chatService.deleteChat(chatId);
+            return new Response(HttpStatus.OK, null, "chat deleted");
+        } catch (Exception e) {
+            return new Response(HttpStatus.BAD_REQUEST, null, e.getMessage());
+        }
     }
 
     /*********************************************************************************************************/

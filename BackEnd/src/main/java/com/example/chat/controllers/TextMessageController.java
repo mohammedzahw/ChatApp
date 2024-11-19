@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,21 +40,17 @@ public class TextMessageController {
         }
     }
 
+
     /************************************************************************************************/
-    @PostMapping("/text-message/update-status")
-    public Response updateTextMessageStatus(@RequestBody UpdateTextMessageStatusRequest message)
-
-            throws IOException, TimeoutException {
+    @DeleteMapping("/text-message/delete/{messageId}")
+    public Response deleteTextMessage(@PathVariable("messageId") Integer messageId) {
         try {
-            // System.out.println("message : " + message);
-
-            return new Response(HttpStatus.CREATED, textMessageService.updateTextMessageStatus(message),
-                    "Message updated");
+            textMessageService.deleteTextMessage(messageId);
+            return new Response(HttpStatus.OK, null, "Message deleted");
         } catch (Exception e) {
             return new Response(HttpStatus.NOT_FOUND, null, "Message not found");
         }
     }
-
     /************************************************************************************************/
     @GetMapping("/messages/{chatId}")
     public Response getChatMessages(@PathVariable("chatId") Integer chatId) {
@@ -74,6 +71,7 @@ public class TextMessageController {
         try {
             textMessageService.setChatMessagesToRead(chatId);
 
+
             return new Response(HttpStatus.OK, null, "Messages readed");
         } catch (Exception e) {
             return new Response(HttpStatus.BAD_REQUEST, null, e.getMessage());
@@ -93,6 +91,21 @@ public class TextMessageController {
             return new Response(HttpStatus.BAD_REQUEST, null, e.getMessage());
         }
 
+    }
+
+    /************************************************************************************************/
+    @PostMapping("/text-message/update-status")
+    public Response updateTextMessageStatus(@RequestBody UpdateTextMessageStatusRequest message)
+
+            throws IOException, TimeoutException {
+        try {
+            // System.out.println("message : " + message);
+
+            return new Response(HttpStatus.CREATED, textMessageService.updateTextMessageStatus(message),
+                    "Message updated");
+        } catch (Exception e) {
+            return new Response(HttpStatus.NOT_FOUND, null, "Message not found");
+        }
     }
 
 }

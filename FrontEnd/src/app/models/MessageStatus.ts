@@ -3,4 +3,5 @@ export enum MessageStatus {
   RECEIVED = 'RECEIVED',
   DELETED = 'DELETED',
   READ = 'READ',
+  CLEAR = 'CLEAR',
 }

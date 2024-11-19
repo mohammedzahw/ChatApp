@@ -11,9 +11,22 @@
   flex-direction: row-reverse;
   max-width: 75%;
   margin: 10px;
+& >i
+{
+  margin: 5px;
+  font-size: 12;
+  color: black;
 
+}
+& >i:hover
+{
+  color: red;
+
+}
 
   & .content {
+
+
     padding: 0;
     direction: ltr;
     text-align: left;
@@ -31,7 +44,7 @@
     margin-right: 10px;
     font-size: small;
   }
-  & i {
+  & .status i {
     position: relative;
     top: -5px;
     margin-right: 5px;

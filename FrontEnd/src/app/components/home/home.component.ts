@@ -6,6 +6,7 @@ import { DataService } from '../../services/data.service';
 import { WebSocketService } from '../../services/web-socket.service';
 import { ChatRoomComponent } from '../chat-room/chat-room.component';
 import { ChatComponent } from '../chat/chat.component';
+import { MessageStatus } from '../../models/MessageStatus';
 
 @Component({
   selector: 'app-home',
@@ -65,6 +66,17 @@ export class HomeComponent {
       this.hideChat = false;
     }
     this.opendChat = chat;
+
+    if (this.opendChat.numberOfUreadMessages > 0) {
+      this.apiService.readChatMessages(this.opendChat.id).subscribe((res) => {
+        this.dataService.UpdateChatMessages({
+          chatId: this.opendChat.id,
+          messageId: -1,
+          messageStatus: MessageStatus.READ,
+        });
+      });
+      this.opendChat.numberOfUreadMessages = 0;
+    }
   }
   /*************************************************************** */
   async ngOnInit() {
@@ -74,18 +86,22 @@ export class HomeComponent {
     });
     this.user = await this.dataService.getUser();
     /*************************************************************** */
-    console.log(this.user);
+    // console.log(this.user);
     this.apiService.setUserOnline(this.user.id).subscribe((res) => {});
     this.wsService.connect();
     this.wsService.subscribeToChat(`/topic/user/${this.user.id}`);
     this.wsService.subscribeToMessageNotification(
       `/topic/messages/${this.user.id}`
     );
+
+    this.dataService.receiveUserMessages();
+
     window.addEventListener('beforeunload', this.setUserOffline.bind(this));
   }
   /*************************************************************** */
   setUserOffline(event: Event): void {
     this.apiService.setUserOffline(this.user.id).subscribe((res) => {});
+    this.wsService.disconnect();
   }
   /*************************************************************** */
   ngOnDestroy(): void {
